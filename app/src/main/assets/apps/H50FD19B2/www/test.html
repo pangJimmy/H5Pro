@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init();
+		    document.addEventListener('plusready',function(){
+		    	//plusReady11();
+		    });
+		    
+		    function plusReady11() { 
+                var main = plus.android.runtimeMainActivity(); //获取activity
+                var context = plus.android.importClass('android.content.Context'); //上下文
+                var receiver = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
+                onReceive: getReceive //实现onReceiver回调函数
+                });
+                var IntentFilter = plus.android.importClass('android.content.IntentFilter');//引入过滤器
+                var Intent = plus.android.importClass('android.content.Intent');
+                var filter = new IntentFilter();
+
+                filter.addAction('lachesis_barcode_value_notice_broadcast'); //监听扫码广播
+               
+                main.registerReceiver(receiver, filter); //注册监听
+                
+                console.log("Intent"+Intent);
+            }
+            function getReceive (context, intent) {
+            	console.log("内容："+content);
+            	console.log(intent);
+                alert(intent.getStringExtra('lachesis_barcode_value_notice_broadcast_data_string'));//获取到的值，根据需要自行处理结果
+            }
+            
+            mui.plusReady(function(){
+            	plusReady11();
+			    document.addEventListener("startScan",function(_event){
+			    	    console.log("1:"+JSON.stringify(_event));
+			    });
+            });
+            
+			
+		</script>
+	</body>
+
+</html>

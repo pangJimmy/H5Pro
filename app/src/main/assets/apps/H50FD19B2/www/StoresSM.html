@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+	</head>
+
+    <body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">入库单号扫描</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				 <form action="">
+                 <div class="mui-input-row mui-search">
+                   <input id="searchInput" type="search"  class="mui-input-clear" placeholder="扫描二维码">
+                 </div>
+               </form>
+			</div>
+			<nav class="mui-bar mui-bar-tab " style="text-align: center;"> 
+			   <button type="button" class="mui-btn mui-btn-link" onclick="nextOpt();"> 下 一 步
+		            <span class="mui-icon mui-icon-forward"></span>
+		        </button>
+             </nav>
+		</div>
+	</body>
+
+</html>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript">
+	mui.init();
+//	mui.plusReady(function(){
+//	    var search = document.getElementById("searchInput");
+//	    search.focus();
+//		search.addEventListener("keypress",function(event) {
+//	    if(event.keyCode == "13") {
+//	        document.activeElement.blur();//收起虚拟键盘
+//	        event.preventDefault(); // 阻止默认事件---阻止页面刷新
+//	        IsChecked(search);
+//	    }
+//	   });
+//	})
+	
+    // Android需要调用的方法,将结果回调给html
+    function callJS(result){
+               IsChecked(result);
+    }
+	
+    function IsChecked(v)
+	{
+        mui.ajax('http://120.78.174.41:94/home/IsChecked',{
+      				data:{
+      					tickenum:v
+      				},
+      				dataType:'json',
+      				type:'POST',
+      				timeout:10000,
+      				success:function(data){
+      					if(data.resultCode=="0")
+      					{
+      						mui.openWindow({
+                	             url:'StoresCheck.html',
+                 	             id:'StoresCheck',
+                 	             extras:{
+                 		            code:v
+                 	             }
+                             });
+      					}else{
+      						plus.ui.toast(data.msg);
+//    						obj.value = ''
+      						obj.focus();
+      					}
+      				},
+      				error:function(){
+      					plus.ui.toast("审批异常");
+//    					obj.value = '';
+      					obj.focus();
+      				}
+      	    })
+	}
+	
+	function nextOpt()
+    {
+    	var search = document.getElementById("searchInput");
+    	if(search.value.length==0)
+      	{
+      	    plus.ui.toast("入库单号不能为空");
+      	    return;
+      	}
+    	IsChecked(search);
+    	
+    }
+</script>

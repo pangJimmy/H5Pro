@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>仓库卡位扫描</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="js/mui.min.js"></script>
+
+		<script type="text/javascript">
+			var scan1 = null;
+			function onmarked(type,result)
+			{
+
+				var text = '未知：';
+				switch(type){
+					case plus.barcode.QR:
+					text = 'QR:';
+					break;
+					case plus.barcode.EAN13:
+		            text = 'EAN13: ';
+		            break;
+		            case plus.barcode.EAN8:
+		            text = 'EAN8: ';
+		            break;
+				}
+
+	     		mui.ajax('http://182.61.55.121:94/home/UpdateStoreplace',{
+      				data:{
+      					storeplace:result
+      				},
+      				dataType:'json',
+      				type:'POST',
+      				timeout:10000,
+      				success:function(data){
+      					if(data.resultCode=="0")
+      					{
+      						plus.ui.toast("操作成功");
+      						scan1.close();
+      					    mui.openWindow({
+                                url:'menu.html',
+                                id:'menu'
+                          })  
+      					}else{
+      						plus.ui.toast("操作失败："+data.msg);
+      						
+      					}
+      				},
+      				error:function(){
+      					plus.ui.toast("扫描异常");
+      				}
+      			})
+				
+			}
+			
+			function startScan() {
+				 scan1 = new plus.barcode.Barcode('bcid');
+	             scan1.onmarked = onmarked; 
+	             scan1.start();
+            }
+
+            function endScan(){
+            	if(scan1 != null)
+            	{
+            		scan1.close();
+            	}
+            	
+			     mui.openWindow({
+                        url:'menu.html',
+                         id:'menu'
+                          })  
+            }
+ 		</script>
+ <style type="text/css">
+*#bcid{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			background: #000000;
+		}
+		html, body ,div{
+			height:100%;
+			width: 100%;
+		}
+		.fbt{
+			color: #0E76E1;
+			width: 50%;
+			background-color: #ffffff;
+			float: left; 
+			line-height: 44px;
+			text-align: center;
+		}
+
+	</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">仓库卡位扫码</h1>
+		</header>
+		<div class="mui-content">
+		    <div id= "bcid"></div>
+		    <div class="mui-bar mui-bar-footer" style="padding: 0px;">
+		        <div class="fbt" onclick="startScan();">开始扫描</div>
+		        <div class="fbt" onclick="endScan();">返回菜单</div>
+	        </div>
+
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+{
+  "login.html": {
+    "refer": [
+      "menu.html"
+    ],
+    "resources": []
+  },
+  "menu.html": {
+    "refer": [
+      "test.html",
+      "list.html",
+      "kwscan.html",
+      "kwlist.html",
+      "StoresCheck.html",
+      "StoresSM.html"
+    ],
+    "resources": []
+  },
+  "kwscan.html": {
+    "refer": [
+      "kwlist.html"
+    ],
+    "resources": []
+  },
+  "kwlist.html": {
+    "refer": [
+      "ckkwscan.html",
+      "kwupdate.html"
+    ],
+    "resources": []
+  },
+  "ckkwscan.html": {
+    "refer": [
+      "kwlist.html"
+    ]
+  },
+  "kwupdate.html": {
+    "refer": [
+      "kwupdate.html"
+    ]
+  },
+  "StoresSM.html": {
+    "refer": [
+      "StoresSM.html",
+      "StoresCheck.html"
+    ]
+  }
+}

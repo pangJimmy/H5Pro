@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="js/mui.min.js"></script>
+		
+	</head>
+
+	<body>
+		<input type="hidden" id="hdTickeNum"></input>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">入库审核</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				 <form action="">
+                 <div class="mui-input-row mui-search">
+                   <input id="searchInput" type="search" class="mui-input-clear" placeholder="扫描二维码">
+                 </div>
+               </form>
+				<h4 id="hts">总条数/总重量(kg) : 0 / 0</h4>
+			</div>
+		    <ul id="ullist" class="mui-table-view mui-table-view-striped mui-table-view-condensed" style="padding-bottom: 50px;">
+		        <!--<li class="mui-table-view-cell" style="background-color:#4CD964;">
+		            <div class="mui-table" >
+		                <div class="mui-table-cell mui-col-xs-10">
+		                    <h4 class="mui-ellipsis">布种编号：001</h4>
+		                    <h5>色号 / 缸号：蓝色 / 02</h5>
+		                    <h5>数量 / 重量：1 条 / 1 kg</h5>
+		                    <p class="mui-h6 mui-ellipsis">布种条码：0100002001000000001001001</p>
+		                </div>
+		            </div>
+		        </li>-->
+		    </ul>
+		    
+			<nav class="mui-bar mui-bar-tab" style="=text-align: center;"> 
+		        <!--<div class="mui-btn mui-btn-primary" style="width: 100%;height: 100%;">确 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;认</div>-->
+		        <nav class="mui-bar mui-bar-tab " style="text-align: center;"> 
+			   <button type="button" class="mui-btn mui-btn-link" onclick="approve();"> 确 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;认
+		           
+		       </button>
+             </nav>
+           </nav>  
+		</div>
+	</body>
+
+</html>
+
+<script type="text/javascript">
+	mui.init();
+	mui.plusReady(function(){
+		var code = plus.webview.currentWebview().code;   // 取得参数：父节点Id
+		document.getElementById("hdTickeNum").value = code;
+		loaditem(code);
+//		var search = document.getElementById("searchInput");
+//		search.focus();
+//		search.addEventListener("keypress",function(event) {
+//	    if(event.keyCode == "13") {
+//	        document.activeElement.blur();//收起虚拟键盘
+//	        isExist(this);
+//	        event.preventDefault(); // 阻止默认事件---阻止页面刷新
+//	    }
+//	   });
+	})
+	var tscount = 0;  //总共条数
+	function loaditem(v)
+			{
+				mui.ajax('http://120.78.174.41:94/home/StoresListByGeneraNum',{
+					data:{
+      					code:v
+      				},
+      				dataType:'json',
+      				type:'POST',
+      				timeout:10000,
+      				success:function(data){
+      					if(data.resultCode=="0")
+      					{
+      						var totalcount = 0;
+      						var totalzl = 0;
+      						var strVar = "";
+                            var list = data.result;
+                            for(var i in list) {
+                            	var item = list[i];
+                            	strVar += "<li id='li_"+item.BzCode+"' class=\"mui-table-view-cell\">";
+                            	strVar += "<div class=\"mui-table\">";
+                            	strVar += "<div class=\"mui-table-cell mui-col-xs-10\">";
+                            	strVar += "<h4 class=\"mui-ellipsis\">布种编号："+item.BzID+"</h4>";
+                            	strVar += "<h5>色号 / 缸号："+item.BzColoID+" / " + item.BzGangHao+"</h4>";
+                            	strVar += "<h5>数量 / 重量："+item.MarkUnit+" 条 / "+item.MarkKg+" kg</h5>";
+                            	strVar += "<p class=\"mui-h6 mui-ellipsis\">布种条码："+item.BzCode+"</p>";
+                            	strVar += "</div>";
+                            	//strVar += "<div class=\"mui-table-cell mui-col-xs-2 mui-text-right\">";
+                            	//strVar += "<span class=\"mui-h5\" onclick='delData(\""+item.BzCode+"\")'>删除</span>";
+                            	//strVar += "</div>";
+                            	strVar += "</div>";
+                            	strVar += "</li>";
+                            	totalcount=totalcount+item.MarkUnit;
+                            	totalzl=totalzl+item.MarkKg;
+                            }
+                            tscount = list.length;
+                            var li = document.createElement('li');
+                            li.innerHTML = strVar;
+                
+                            document.getElementById("ullist").innerHTML=strVar;
+                            document.getElementById("hts").innerHTML= '总条数/总重量(kg) : '+totalcount.toFixed(2)+' / '+totalzl.toFixed(2);
+                            var search = document.getElementById("searchInput");
+                            search.value='';
+			                search.focus();
+                            
+      					}else{
+      						plus.ui.toast("加载数据失败："+data.msg);
+      						app.gologin();
+      					}
+      				},
+      				error:function(){
+      					plus.ui.toast("加载数据异常");
+      				}
+      			})
+			}
+			
+	// Android需要调用的方法,将结果回调给html
+    function callJS(result){
+               isExist(result);
+    }		
+			
+			
+	var tscounted = 0;   //已被扫条数
+	function isExist(v)
+	{
+		mui.ajax('http://120.78.174.41:94/home/StoresByBzCode',{
+      				data:{
+      					bzcode:v,
+      					generanum:document.getElementById("hdTickeNum").value
+      				},
+      				dataType:'json',
+      				type:'POST',
+      				timeout:10000,
+      				success:function(data){
+      					if(data.resultCode=="0")
+      					{
+      						plus.ui.toast("扫描成功");
+      						tscounted++;
+      						var id = "li_"+v;
+		                    document.getElementById(id).style.backgroundColor="#4CD964";
+//		                    obj.value = '';
+//		                    obj.focus();
+      					}else{
+      						plus.ui.toast(data.msg);
+//    						obj.value = '';
+//		                    obj.focus();
+      					}
+      				},
+      				error:function(){
+      					plus.ui.toast("扫描异常");
+//    					obj.value = '';
+//		                obj.focus();
+      				}
+      	})
+		
+	}
+	
+	function approve()
+	{
+		if(tscount == 0 || tscounted != tscount)
+		{
+			plus.ui.toast("提交失败：扫描条数与入库单号条数不匹配");
+			return false;
+		}else{
+		    mui.ajax('http://182.61.55.121:94/home/SubmitStores',{
+      				data:{
+      					tickenum:document.getElementById("hdTickeNum").value
+      				},
+      				dataType:'json',
+      				type:'POST',
+      				timeout:10000,
+      				success:function(data){
+      					if(data.resultCode=="0")
+      					{
+      						plus.ui.toast(data.msg);
+      						 mui.openWindow({
+                                url:'menu.html',
+                                id:'menu'
+                            })
+      					}else{
+      						plus.ui.toast(data.msg);
+      					}
+      				},
+      				error:function(){
+      					plus.ui.toast("审批异常");
+      				}
+      	    })
+		}
+	}
+	
+	
+</script>
