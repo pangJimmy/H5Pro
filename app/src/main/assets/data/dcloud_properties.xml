@@ -55,12 +55,16 @@
 			<module name="OAuth-MiUi" value="io.dcloud.feature.oauth.miui.MiUiOAuthService"/>
 		</feature>
 		<feature name="Stream" value="io.dcloud.appstream.js.StreamAppFeatureImpl"/>
+		<feature
+			name="pluginscan"
+			value="com.HBuilder.scan.Scan" />
 	</features>	
 
 	<services>
 		<service name="push" value="io.dcloud.feature.aps.APSFeatureImpl"/>
 		<service name="Statistic" value="io.dcloud.feature.statistics.StatisticsBootImpl"/>
 		<service name="Downloader" value="io.dcloud.net.DownloaderBootImpl"/>
+		<service name="pluginscan" value="com.HBuilder.scan.Scan"/>
         <!--<service name="Maps" value="io.dcloud.js.map.MapInitImpl"/>-->
 	</services>
 </properties>

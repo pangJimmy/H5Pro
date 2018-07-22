@@ -36,7 +36,10 @@
         
         "Invocation":{
         	"description": "Native.js"
-        }
+        },
+		"pluginscan": {
+			"description": "H5Plug Plugin Demo2"
+		}
 	},
 	"plus": {
 		"splashscreen": {
