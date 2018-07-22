@@ -53,15 +53,22 @@
 <script type="text/javascript" src="./js/common.js"></script>
 <script src="js/mui.min.js"></script>
 <script type="text/javascript">
-	mui.init();
+	var _code;
 	var main;
 	var receiver;
+	mui.init();
 	mui.plusReady(function(){
-		var code = plus.webview.currentWebview().code;   // 取得参数：父节点Id
-		document.getElementById("hdTickeNum").value = code;
-		loaditem(code);
+		_code = plus.webview.currentWebview().code;   // 取得参数：父节点Id
+		document.getElementById("hdTickeNum").value = _code;
+		loaditem(_code);
 
-      	<!--监听android 广播-->
+      	openRegisterReceiver();
+
+	})
+
+	function openRegisterReceiver()
+	{
+		<!--监听android 广播-->
         main = plus.android.runtimeMainActivity();
       	receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
 		onReceive: function(context, intent) { //实现onReceiver回调函数
@@ -79,8 +86,18 @@
 		var filter = new IntentFilter();
 		filter.addAction("scan.rcv.message"); //监听扫描返回结果
 		main.registerReceiver(receiver, filter); //注册监听
+	}
 
-	})
+	mui.back = function(){
+		<!--取消监听-->
+    	main.unregisterReceiver(receiver);
+		var _beforePage = plus.webview.getWebviewById(_code);
+        mui.fire(_beforePage,'refreshRegisterReceiver',{});
+        mui.currentWebview.close();
+    }
+
+
+
 	var tscount = 0;  //总共条数
 	function loaditem(v)
 			{

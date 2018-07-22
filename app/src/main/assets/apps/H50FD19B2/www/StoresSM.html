@@ -39,7 +39,12 @@
 	var main;
 	var receiver;
 	mui.plusReady(function(){
-      	<!--监听android 广播-->
+      	openRegisterReceiver();
+    })
+
+    function openRegisterReceiver()
+    {
+    	<!--监听android 广播-->
       	main = plus.android.runtimeMainActivity();
         receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
 		onReceive: function(context, intent) { //实现onReceiver回调函数
@@ -55,16 +60,13 @@
 		});
 		var IntentFilter = plus.android.importClass('android.content.IntentFilter');
 		var filter = new IntentFilter();
-		filter.addAction("scan.rcv.message"); //监听扫描返回结果
+		filter.addAction("scan.rcv.message");    //监听扫描返回结果
 		main.registerReceiver(receiver, filter); //注册监听
-
-  })
-
-    // Android需要调用的方法,将结果回调给html
-    function callJS(result){
-               IsChecked(result);
     }
 
+    window.addEventListener('refreshRegisterReceiver',function(){
+		openRegisterReceiver();
+	)
     function IsChecked(v)
 	{
         mui.ajax('http://120.78.174.41:94/home/IsChecked',{

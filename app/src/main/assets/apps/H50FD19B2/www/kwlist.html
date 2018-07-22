@@ -58,8 +58,13 @@
 	    var receiver;
 		mui.plusReady(function(){
 		    loaditem();
+			openRegisterReceiver();
 
-			<!--监听android 广播-->
+		})
+
+		function openRegisterReceiver()
+        {
+        	<!--监听android 广播-->
             main = plus.android.runtimeMainActivity();
       	    receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
 		        onReceive: function(context, intent) { //实现onReceiver回调函数
@@ -77,7 +82,13 @@
 		    var filter = new IntentFilter();
 		    filter.addAction("scan.rcv.message"); //监听扫描返回结果
 		    main.registerReceiver(receiver, filter); //注册监听
-		})
+        }
+
+        window.addEventListener('refreshRegisterReceiver',function(){
+		    openRegisterReceiver();
+	    )
+
+
 
 			function load()
 			{
