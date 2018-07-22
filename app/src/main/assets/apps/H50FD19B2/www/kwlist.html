@@ -1,75 +1,84 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-		<link href="css/mui.min.css" rel="stylesheet" />
-		
-	</head>
-	<body>
-		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		    <h1 class="mui-title">库位调整列表</h1>
-		</header>
-		<div class="mui-content">
-			<div class="mui-content-padded">
-				 <form action="">
-                 <div class="mui-input-row mui-search">
-                   <input id="searchInput" type="search" class="mui-input-clear" placeholder="扫描二维码">
-                 </div>
-               </form>
-				<h4 id="hts">总条数/总重量(kg) : 0 / 0</h4>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="css/mui.min.css" rel="stylesheet" />
+
+</head>
+<body>
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">库位调整列表</h1>
+</header>
+<div class="mui-content">
+	<div class="mui-content-padded">
+		<form action="">
+			<div class="mui-input-row mui-search">
+				<input id="searchInput" type="search" class="mui-input-clear" placeholder="扫描二维码">
 			</div>
-		    <ul id="ullist" class="mui-table-view mui-table-view-striped mui-table-view-condensed" style="padding-bottom: 50px;">
-		        <!--<li class="mui-table-view-cell">
-		            <div class="mui-table">
-		                <div class="mui-table-cell mui-col-xs-10">
-		                    <h4 class="mui-ellipsis">布种编号：001</h4>
-		                    <h5>色号 / 缸号：蓝色 / 02</h5>
-		                    <h5>数量 / 重量：1 条 / 1 kg</h5>
-		                    <p class="mui-h6 mui-ellipsis">布种条码：0100002001000000001001001</p>
-		                </div>
-		                <div class="mui-table-cell mui-col-xs-2 mui-text-right">
-		                    <span class="mui-h5">12:25</span>
-		                </div>
-		            </div>
-		        </li>-->
-		    </ul>
-		    
-			<nav class="mui-bar mui-bar-tab " style="text-align: center;"> 
-			   <button type="button" class="mui-btn mui-btn-link" onclick="nextOpt();"> 下 一 步
-		            <span class="mui-icon mui-icon-forward"></span>
-		        </button>
-             </nav>
-		</div>
-	
-	
-		<script src="js/mui.min.js"></script>
-		<script src="js/app.js"></script>
-		<script type="text/javascript">
-		    mui.init({
-		    	beforeback:function(){
-		    		
-		    	}
+		</form>
+		<h4 id="hts">总条数/总重量(kg) : 0 / 0</h4>
+	</div>
+	<ul id="ullist" class="mui-table-view mui-table-view-striped mui-table-view-condensed" style="padding-bottom: 50px;">
+		<!--<li class="mui-table-view-cell">
+            <div class="mui-table">
+                <div class="mui-table-cell mui-col-xs-10">
+                    <h4 class="mui-ellipsis">布种编号：001</h4>
+                    <h5>色号 / 缸号：蓝色 / 02</h5>
+                    <h5>数量 / 重量：1 条 / 1 kg</h5>
+                    <p class="mui-h6 mui-ellipsis">布种条码：0100002001000000001001001</p>
+                </div>
+                <div class="mui-table-cell mui-col-xs-2 mui-text-right">
+                    <span class="mui-h5">12:25</span>
+                </div>
+            </div>
+        </li>-->
+	</ul>
+
+	<nav class="mui-bar mui-bar-tab " style="text-align: center;">
+		<button type="button" class="mui-btn mui-btn-link" onclick="nextOpt();"> 下 一 步
+			<span class="mui-icon mui-icon-forward"></span>
+		</button>
+	</nav>
+</div>
+
+</body>
+</html>
+
+<!--引入扫描js-->
+<script type="text/javascript" src="./js/scan.js"></script>
+<script type="text/javascript" src="./js/common.js"></script>
+<script src="js/mui.min.js"></script>
+<script src="js/app.js"></script>
+<script type="text/javascript">
+		mui.init();
+        var main;
+	    var receiver;
+		mui.plusReady(function(){
+		    loaditem();
+
+			<!--监听android 广播-->
+            main = plus.android.runtimeMainActivity();
+      	    receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
+		        onReceive: function(context, intent) { //实现onReceiver回调函数
+    		    plus.android.importClass(intent);
+    		    console.log(intent.getAction());
+    		    var scantest = document.getElementById("searchInput");
+    	    	<!--获取返回结果-->
+    		    var bacodebyte = intent.getByteArrayExtra("barocode");
+    		    var bacodestring = byteToString(bacodebyte) ;
+      		    scantest.value = bacodestring ;
+    		    toAdd(bacodestring);
+    		  }
 		    });
-		    window.addEventListener('showload',function(){
-		    	setTimeout(function(){
-				var search = document.getElementById("searchInput");
-					console.log("55"+JSON.stringify(search))
-					search.focus();
-				},5000);
-		    })
-		    document.addEventListener('plusready',function(){
-		    	loaditem();
-				setTimeout(load(),1000);
-				
-		    },false)
-//			mui.plusReady(function(){
-//		    	loaditem();
-//				load();
-//			})
-			
+		    var IntentFilter = plus.android.importClass('android.content.IntentFilter');
+		    var filter = new IntentFilter();
+		    filter.addAction("scan.rcv.message"); //监听扫描返回结果
+		    main.registerReceiver(receiver, filter); //注册监听
+		})
+
 			function load()
 			{
 				var search = document.getElementById("searchInput");
@@ -83,11 +92,11 @@
 	          });
 			}
 
-			function toAdd(btn)
+			function toAdd(v)
 			{
 				mui.ajax('http://120.78.174.41:94/home/AddStores',{
       				data:{
-      					code:btn.value
+      					code:v
       				},
       				dataType:'json',
       				type:'POST',
@@ -106,7 +115,7 @@
       				}
       			})
 			}
-			
+
 			function loaditem()
 			{
 				mui.ajax('http://120.78.174.41:94/home/StoresList',{
@@ -140,13 +149,13 @@
                             }
                             var li = document.createElement('li');
                             li.innerHTML = strVar;
-                
+
                             document.getElementById("ullist").innerHTML=strVar;
                             document.getElementById("hts").innerHTML= '总条数/总重量(kg) : '+totalcount.toFixed(2)+' / '+totalzl.toFixed(2);
                             var search = document.getElementById("searchInput");
                             search.value='';
 			                search.focus();
-                            
+
       					}else{
       						plus.ui.toast("加载数据失败："+data.msg);
       						app.gologin();
@@ -157,7 +166,7 @@
       				}
       			})
 			}
-			
+
 			function delData(code)
 			{
 				mui.ajax('http://120.78.174.41:94/home/DelStores',{
@@ -182,9 +191,11 @@
       				}
       			})
 			}
-			
+
 			function nextOpt()
 			{
+				<!--取消监听-->
+    		    main.unregisterReceiver(receiver);
 				var _currentPage_id  = plus.webview.currentWebview().id;
 				mui.openWindow({
                 	url:'kwupdate.html',
@@ -196,6 +207,3 @@
 			}
 
 		</script>
-	</body>
-
-</html>

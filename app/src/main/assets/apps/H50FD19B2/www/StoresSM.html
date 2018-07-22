@@ -1,55 +1,70 @@
 <!doctype html>
 <html>
 
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-		<link href="css/mui.min.css" rel="stylesheet" />
-	</head>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="css/mui.min.css" rel="stylesheet" />
+</head>
 
-    <body>
-		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		    <h1 class="mui-title">入库单号扫描</h1>
-		</header>
-		<div class="mui-content">
-			<div class="mui-content-padded">
-				 <form action="">
-                 <div class="mui-input-row mui-search">
-                   <input id="searchInput" type="search"  class="mui-input-clear" placeholder="扫描二维码">
-                 </div>
-               </form>
+<body>
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">入库单号扫描</h1>
+</header>
+<div class="mui-content">
+	<div class="mui-content-padded">
+		<form action="">
+			<div class="mui-input-row mui-search">
+				<input id="searchInput" type="search"  class="mui-input-clear" placeholder="扫描二维码">
 			</div>
-			<nav class="mui-bar mui-bar-tab " style="text-align: center;"> 
-			   <button type="button" class="mui-btn mui-btn-link" onclick="nextOpt();"> 下 一 步
-		            <span class="mui-icon mui-icon-forward"></span>
-		        </button>
-             </nav>
-		</div>
-	</body>
+		</form>
+	</div>
+	<!--<nav class="mui-bar mui-bar-tab " style="text-align: center;">
+       <button type="button" id="btnnext" class="mui-btn mui-btn-link" onclick="nextOpt();"> 扫 描
+            <span class="mui-icon mui-icon-forward"></span>
+        </button>
+     </nav>-->
+</div>
+</body>
 
 </html>
+<!--引入扫描js-->
+<script type="text/javascript" src="./js/scan.js"></script>
+<script type="text/javascript" src="./js/common.js"></script>
 <script src="js/mui.min.js"></script>
 <script type="text/javascript">
 	mui.init();
-//	mui.plusReady(function(){
-//	    var search = document.getElementById("searchInput");
-//	    search.focus();
-//		search.addEventListener("keypress",function(event) {
-//	    if(event.keyCode == "13") {
-//	        document.activeElement.blur();//收起虚拟键盘
-//	        event.preventDefault(); // 阻止默认事件---阻止页面刷新
-//	        IsChecked(search);
-//	    }
-//	   });
-//	})
-	
+	var main;
+	var receiver;
+	mui.plusReady(function(){
+      	<!--监听android 广播-->
+      	main = plus.android.runtimeMainActivity();
+        receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
+		onReceive: function(context, intent) { //实现onReceiver回调函数
+    		plus.android.importClass(intent);
+    		console.log(intent.getAction());
+    		var scantest = document.getElementById("searchInput");
+    		<!--获取返回结果-->
+    		var bacodebyte = intent.getByteArrayExtra("barocode");
+    		var bacodestring = byteToString(bacodebyte) ;
+      		scantest.value = bacodestring ;
+    		IsChecked(bacodestring);
+    		}
+		});
+		var IntentFilter = plus.android.importClass('android.content.IntentFilter');
+		var filter = new IntentFilter();
+		filter.addAction("scan.rcv.message"); //监听扫描返回结果
+		main.registerReceiver(receiver, filter); //注册监听
+
+  })
+
     // Android需要调用的方法,将结果回调给html
     function callJS(result){
                IsChecked(result);
     }
-	
+
     function IsChecked(v)
 	{
         mui.ajax('http://120.78.174.41:94/home/IsChecked',{
@@ -62,6 +77,8 @@
       				success:function(data){
       					if(data.resultCode=="0")
       					{
+      						<!--取消监听-->
+    		                main.unregisterReceiver(receiver);
       						mui.openWindow({
                 	             url:'StoresCheck.html',
                  	             id:'StoresCheck',

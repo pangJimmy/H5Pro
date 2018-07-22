@@ -1,42 +1,50 @@
 <!doctype html>
 <html>
 
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-		<link href="css/mui.min.css" rel="stylesheet" />
-		<script src="js/mui.min.js"></script>
-		<script type="text/javascript">
-			var _PID;
-			mui.init({
-				//处理窗口关闭前的业务
-				beforeback:function(e){
-					console.log("out:"+_PID);
-					if(plus.webview.getWebviewById('win-kwupdate')){    //如果win-kwupdate 页面打开了，就关闭该页面
-						plus.webview.close('win-kwupdate','slide-out-bottom');
-					}
-					
-					var _beforePage = plus.webview.getWebviewById(_PID);
-					mui.fire(_beforePage,'showload',{});
-				}
-			});
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="css/mui.min.css" rel="stylesheet" />
+	<script src="js/mui.min.js"></script>
+	<script type="text/javascript">
+			mui.init();
+			var main;
+	        var receiver;
 			mui.plusReady(function(){
-				var _parentID = plus.webview.currentWebview().parentID;   // 取得参数：父节点Id
-				console.log("input:"+_parentID);
-				_PID= _parentID;  
-				var search = document.getElementById("search");
-				search.focus();
-                search.addEventListener("keypress",function(event) {
-                if(event.keyCode == "13") {
-                   document.activeElement.blur();//收起虚拟键盘
-                   toUpdate(this.value);//TODO 完成搜索事件
-                   search.value = "";
-                   event.preventDefault(); // 阻止默认事件---阻止页面刷新
-                  }
-                });
+//				var _parentID = plus.webview.currentWebview().parentID;   // 取得参数：父节点Id
+//				console.log("input:"+_parentID);
+//				_PID= _parentID;
+//				var search = document.getElementById("search");
+//				search.focus();
+//              search.addEventListener("keypress",function(event) {
+//              if(event.keyCode == "13") {
+//                 document.activeElement.blur();//收起虚拟键盘
+//                 toUpdate(this.value);//TODO 完成搜索事件
+//                 search.value = "";
+//                 event.preventDefault(); // 阻止默认事件---阻止页面刷新
+//                }
+//              });
+                <!--监听android 广播-->
+         	     main = plus.android.runtimeMainActivity();
+      	         receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
+		            onReceive: function(context, intent) { //实现onReceiver回调函数
+    		        plus.android.importClass(intent);
+    		        console.log(intent.getAction());
+    		        var scantest = document.getElementById("searchInput");
+    	    	    <!--获取返回结果-->
+    		        var bacodebyte = intent.getByteArrayExtra("barocode");
+    		        var bacodestring = byteToString(bacodebyte) ;
+      		        scantest.value = bacodestring ;
+    		        toUpdate(bacodestring);
+    		      }
+		        });
+		        var IntentFilter = plus.android.importClass('android.content.IntentFilter');
+		        var filter = new IntentFilter();
+		        filter.addAction("scan.rcv.message"); //监听扫描返回结果
+		        main.registerReceiver(receiver, filter); //注册监听
 			})
-			
+
 		    function toUpdate(v)
 			{
 			    mui.ajax('http://120.78.174.41:94/home/UpdateStoreplace',{
@@ -49,14 +57,16 @@
       				success:function(data){
       					if(data.resultCode=="0")
       					{
+      						<!--取消监听-->
+    		                main.unregisterReceiver(receiver);
       						plus.ui.toast("操作成功");
       					    mui.openWindow({
                                 url:'menu.html',
                                 id:'menu'
-                          })  
+                          })
       					}else{
       						plus.ui.toast("操作失败："+data.msg);
-      						
+
       					}
       				},
       				error:function(){
@@ -65,21 +75,21 @@
       			})
 			}
 		</script>
-	</head>
-	<body>
-		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		    <h1 class="mui-title">卡位二维码扫描</h1>
-		</header>
-		<div class="mui-content">
-			<div class="mui-content-padded">
-				 <form action="">
-                 <div class="mui-input-row mui-search">
-                   <input id="search" type="search"  class="mui-input-clear" placeholder="扫描二维码">
-                 </div>
-               </form>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">卡位二维码扫描</h1>
+</header>
+<div class="mui-content">
+	<div class="mui-content-padded">
+		<form action="">
+			<div class="mui-input-row mui-search">
+				<input id="search" type="search"  class="mui-input-clear" placeholder="扫描二维码">
 			</div>
-		</div>
-	</body>
+		</form>
+	</div>
+</div>
+</body>
 
 </html>

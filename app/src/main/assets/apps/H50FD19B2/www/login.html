@@ -1,61 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>登录</title>
-    <script src="js/mui.min.js"></script>
-<!--引入扫描js-->
-	<script type="text/javascript" src="./js/scan.js"></script>
-	<script type="text/javascript" src="./js/common.js"></script>
-    <link href="css/mui.min.css" rel="stylesheet"/>
-    <style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>登录</title>
+	<script src="js/mui.min.js"></script>
+	<link href="css/mui.min.css" rel="stylesheet"/>
+	<style>
 			.area {
 				margin: 20px auto 0px auto;
 			}
-			
+
 			.mui-input-group {
 				margin-top: 10px;
 			}
-			
+
 			.mui-input-group:first-child {
 				margin-top: 20px;
 			}
-			
+
 			.mui-input-group label {
 				width: 22%;
 			}
-			
+
 			.mui-input-row label~input,
 			.mui-input-row label~select,
 			.mui-input-row label~textarea {
 				width: 78%;
 			}
-			
+
 			.mui-checkbox input[type=checkbox],
 			.mui-radio input[type=radio] {
 				top: 6px;
 			}
-			
+
 			.mui-content-padded {
 				margin-top: 25px;
 			}
-			
+
 			.mui-btn {
 				padding: 10px;
 			}
-			
+
 			.link-area {
 				display: block;
 				margin-top: 25px;
 				text-align: center;
 			}
-			
+
 			.spliter {
 				color: #bbb;
 				padding: 0px 8px;
 			}
-			
+
 			.oauth-area {
 				position: absolute;
 				bottom: 20px;
@@ -65,7 +62,7 @@
 				padding: 0px;
 				margin: 0px;
 			}
-			
+
 			.oauth-area .oauth-btn {
 				display: inline-block;
 				width: 50px;
@@ -78,52 +75,18 @@
 				border: solid 1px #ddd;
 				border-radius: 25px;
 			}
-			
+
 			.oauth-area .oauth-btn:active {
 				border: solid 1px #aaa;
 			}
-			
+
 			.oauth-area .oauth-btn.disabled {
 				background-color: #ddd;
 			}
 		</style>
-    <script type="text/javascript" charset="utf-8">
+	<script type="text/javascript" charset="utf-8">
       	mui.init();
       	mui.plusReady(function(){
-      	<!--扫描-->
-      	var scan=document.getElementById("scan");
-      	<!--监听android 广播-->
-      	var main = plus.android.runtimeMainActivity();
-      	var receiver=plus.android.implements('io.dcloud.android.content.BroadcastReceiver', {
-		onReceive: function(context, intent) { //实现onReceiver回调函数
-    		plus.android.importClass(intent);
-    		console.log(intent.getAction());
-    		var scantest = document.getElementById("scantest");
-    		<!--获取返回结果-->
-    		var bacodebyte = intent.getByteArrayExtra("barocode");
-    		var bacodestring = byteToString(bacodebyte) ;
-      		scantest.value = bacodestring ;
-    		//main.unregisterReceiver(receiver);
-    		}
-		});
-		var IntentFilter = plus.android.importClass('android.content.IntentFilter');
-		var filter = new IntentFilter();
-		filter.addAction("scan.rcv.message"); //监听扫描返回结果
-		main.registerReceiver(receiver, filter); //注册监听
-
-      	scan.addEventListener('tap',function(){
-      		//var scantest = document.getElementById("scantest");
-      		//scantest.value = 123 ;
-			<!--调用扫描-->
-      		plus.pluginscan.PluginTestFunction("Html5","Plus","AsyncFunction","MultiArgument!",
-    		function( result ) {
-
-    		},
-    		function(result){
-
-    		});
-      	});
-      	<!-------------------------分割线--------------------------->
       		var login=document.getElementById("login");
       		login.addEventListener('tap',function(){
       			var account = document.getElementById("account");
@@ -138,7 +101,6 @@
       				plus.ui.toast("密码不能为空");
       				return;
       			}
-      			         
       			mui.ajax('http://120.78.174.41:94/home/login',{
       				data:{
       					usercode:account.value,
@@ -169,33 +131,27 @@
     </script>
 </head>
 <body>
-	<header class="mui-bar mui-bar-nav">
-	    <h1 class="mui-title">登录</h1>
-	</header>
-	<div class="mui-content">
-	    <form id='login-form' class="mui-input-group">
-				<div class="mui-input-row">
-					<label>账号</label>
-					<input id='account' type="text" class="mui-input-clear mui-input" placeholder="请输入账号" value="zh">
-				</div>
-				<div class="mui-input-row">
-					<label>密码</label>
-					<input id='password' type="password" class="mui-input-clear mui-input" placeholder="请输入密码" value="123456">
-				</div>
-			</form>
-			 <!--注意：登录按钮不能和账号密码输入框放在一个form里面-->
-			<div class="mui-content-padded">
-				<button id='login' class="mui-btn mui-btn-block mui-btn-primary" >登录</button>
-			</div>
-		<br/>
+<header class="mui-bar mui-bar-nav">
+	<h1 class="mui-title">登录</h1>
+</header>
+<div class="mui-content">
+	<form id='login-form' class="mui-input-group">
 		<div class="mui-input-row">
-			<label>扫描结果</label>
-			<input id='scantest' type="text" class="mui-input-clear mui-input" >
+			<label>账号</label>
+			<input id='account' type="text" class="mui-input-clear mui-input" placeholder="请输入账号" value="zh">
 		</div>
-		<div class="mui-content-padded">
-			<button id='scan' class="mui-btn mui-btn-block mui-btn-primary" >扫描</button>
+		<div class="mui-input-row">
+			<label>密码</label>
+			<input id='password' type="password" class="mui-input-clear mui-input" placeholder="请输入密码" value="123456">
 		</div>
+	</form>
+	<!--注意：登录按钮不能和账号密码输入框放在一个form里面-->
+	<div class="mui-content-padded">
+		<button id='login' class="mui-btn mui-btn-block mui-btn-primary" >登录</button>
 	</div>
-	
+
+
+</div>
+
 </body>
 </html>
